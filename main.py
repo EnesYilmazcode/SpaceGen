@@ -1,6 +1,5 @@
 import tkinter as tk
 import random
-import time
 
 matrix = [[1 for _ in range(50)] for _ in range(50)]
 
@@ -115,25 +114,45 @@ def smooth_once():
                 changed = True
 
     matrix = new_matrix
-    return changed
-
-
-def smooth(event):
-    """Smooths until stable or max iterations reached"""
-    max_iterations = 50
-
-    for i in range(max_iterations):
-        changed = smooth_once()
-        if not changed:
-            break
     
-
-    # Update display
+    # Update display after each iteration
     for row in range(50):
         for col in range(50):
             color = 'white' if matrix[row][col] == 1 else 'black'
             canvas.itemconfig(rectangles[(row, col)], fill=color)
-            
+    
+    return changed
+
+
+# Animation state
+smooth_iteration = 0
+smooth_max_iterations = 50
+smooth_delay_ms = 50  # ADJUST THIS VALUE: delay in milliseconds between smoothing steps
+
+def smooth_step():
+    """Run one step of smoothing animation"""
+    global smooth_iteration
+    
+    if smooth_iteration < smooth_max_iterations:
+        changed = smooth_once()
+        smooth_iteration += 1
+        
+        if changed:
+            # Schedule next iteration
+            root.after(smooth_delay_ms, smooth_step)
+        else:
+            # Stop if stable
+            smooth_iteration = 0
+    else:
+        # Max iterations reached
+        smooth_iteration = 0
+
+
+def smooth(event):
+    """Start animated smoothing"""
+    global smooth_iteration
+    smooth_iteration = 0
+    smooth_step()
 
 
 canvas.bind("<Button-1>", on_click)
