@@ -1,5 +1,5 @@
 # SpaceGen
-Create Rounded spaces based on Random Generation
+Create smoothed spaces based on Random Generation
 
 <div align="center">
   <img src="spacegen.gif" alt="SpaceGen Demo" width="500"/>
