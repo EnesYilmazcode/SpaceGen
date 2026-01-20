@@ -10,7 +10,6 @@ canvas = tk.Canvas(root, width=500, height=500, bg='white')
 canvas.pack()
 
 cell_size = 10
-
 rectangles = {}
 
 for row in range(50):
@@ -19,57 +18,43 @@ for row in range(50):
         y1 = row * cell_size
         x2 = x1 + cell_size
         y2 = y1 + cell_size
-        
         rect_id = canvas.create_rectangle(x1, y1, x2, y2, fill='white')
         rectangles[(row, col)] = rect_id
 
 is_dragging = False
 
 def paint_cell(row, col):
-    """Set a cell to 0 (black)"""
     if 0 <= row < 50 and 0 <= col < 50:
         if matrix[row][col] == 1:
             matrix[row][col] = 0
-            rect_id = rectangles[(row, col)]
-            canvas.itemconfig(rect_id, fill='black')
+            canvas.itemconfig(rectangles[(row, col)], fill='black')
 
 def on_click(event):
     global is_dragging
     is_dragging = True
-    
     col = event.x // cell_size
     row = event.y // cell_size
-    
     if 0 <= row < 100 and 0 <= col < 100:
         matrix[row][col] = 1 - matrix[row][col]
-        
         new_color = 'white' if matrix[row][col] == 1 else 'black'
-        rect_id = rectangles[(row, col)]
-        canvas.itemconfig(rect_id, fill=new_color)
-        
-        
+        canvas.itemconfig(rectangles[(row, col)], fill=new_color)
 
 def on_drag(event):
-    """Paint cells while dragging"""
     if is_dragging:
         col = event.x // cell_size
         row = event.y // cell_size
         paint_cell(row, col)
 
 def on_release(event):
-    """Stop dragging and auto-smooth"""
     global is_dragging, smooth_iteration
     if is_dragging:
         is_dragging = False
-        # Auto-start smoothing after drawing
         smooth_iteration = 0
-        root.after(100, smooth_step)  # Small delay before smoothing starts
+        root.after(100, smooth_step)
 
 def on_key_r(event):
-    """Initialize random noise for cave generation (45% walls)"""
     global smooth_iteration
     wall_chance = 0.45
-
     for row in range(50):
         for col in range(50):
             if random.random() < wall_chance:
@@ -78,28 +63,19 @@ def on_key_r(event):
             else:
                 matrix[row][col] = 1
                 canvas.itemconfig(rectangles[(row, col)], fill='white')
-
-    # Auto-start smoothing after random generation
     smooth_iteration = 0
     root.after(100, smooth_step)
 
 def on_key_c(event):
-    """Clear all - reset everything to 1 (white)"""
     for row in range(50):
         for col in range(50):
             matrix[row][col] = 1
-            rect_id = rectangles[(row, col)]
-            canvas.itemconfig(rect_id, fill='white')
-    
-    
-
+            canvas.itemconfig(rectangles[(row, col)], fill='white')
 
 def smooth_once():
-    """Run one smoothing pass, returns True if any cells changed"""
     global matrix
     new_matrix = [[0 for _ in range(50)] for _ in range(50)]
     changed = False
-
     for row in range(50):
         for col in range(50):
             wall_count = 0
@@ -110,37 +86,28 @@ def smooth_once():
                             wall_count += 1
                     else:
                         wall_count += 1
-
             if wall_count >= 5:
                 new_matrix[row][col] = 0
             else:
                 new_matrix[row][col] = 1
-
             if new_matrix[row][col] != matrix[row][col]:
                 changed = True
-
     matrix = new_matrix
-    
     for row in range(50):
         for col in range(50):
             color = 'white' if matrix[row][col] == 1 else 'black'
             canvas.itemconfig(rectangles[(row, col)], fill=color)
-    
     return changed
-
 
 smooth_iteration = 0
 smooth_max_iterations = 50
 smooth_delay_ms = 50
 
 def smooth_step():
-    """Run one step of smoothing animation"""
     global smooth_iteration
-    
     if smooth_iteration < smooth_max_iterations:
         changed = smooth_once()
         smooth_iteration += 1
-        
         if changed:
             root.after(smooth_delay_ms, smooth_step)
         else:
@@ -148,12 +115,10 @@ def smooth_step():
     else:
         smooth_iteration = 0
 
-
 def smooth(event):
     global smooth_iteration
     smooth_iteration = 0
     smooth_step()
-
 
 canvas.bind("<Button-1>", on_click)
 canvas.bind("<B1-Motion>", on_drag)
