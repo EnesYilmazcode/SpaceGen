@@ -1,5 +1,6 @@
 import tkinter as tk
 import random
+import time
 
 matrix = [[1 for _ in range(50)] for _ in range(50)]
 
@@ -118,23 +119,29 @@ def smooth_once():
     return changed
 
 
+def update_display():
+    """Update the canvas to match the matrix"""
+    for row in range(50):
+        for col in range(50):
+            color = 'white' if matrix[row][col] == 1 else 'black'
+            canvas.itemconfig(rectangles[(row, col)], fill=color)
+    canvas.update()
+
+
 def smooth(event):
     """Smooths until stable or max iterations reached"""
     max_iterations = 50
 
     for i in range(max_iterations):
         changed = smooth_once()
+        update_display()
+        time.sleep(0.1)
         if not changed:
             print(f"Stabilized after {i + 1} iterations")
             break
     else:
         print(f"Stopped after {max_iterations} iterations")
 
-    # Update display
-    for row in range(50):
-        for col in range(50):
-            color = 'white' if matrix[row][col] == 1 else 'black'
-            canvas.itemconfig(rectangles[(row, col)], fill=color)
 
 canvas.bind("<Button-1>", on_click)
 canvas.bind("<B1-Motion>", on_drag)
