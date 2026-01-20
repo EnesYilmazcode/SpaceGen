@@ -49,7 +49,7 @@ def on_click(event):
         rect_id = rectangles[(row, col)]
         canvas.itemconfig(rect_id, fill=new_color)
         
-        print(f"Cell [{row}][{col}] = {matrix[row][col]}")
+        
 
 def on_drag(event):
     """Paint cells while dragging"""
@@ -76,7 +76,7 @@ def on_key_r(event):
                 matrix[row][col] = 1
                 canvas.itemconfig(rectangles[(row, col)], fill='white')
 
-    print("Random noise generated (45% walls)")
+    
 
 def on_key_c(event):
     """Clear all - reset everything to 1 (white)"""
@@ -86,8 +86,7 @@ def on_key_c(event):
             rect_id = rectangles[(row, col)]
             canvas.itemconfig(rect_id, fill='white')
     
-    print("Grid cleared - all cells reset to 1")
-
+    
 
 
 def smooth_once():
@@ -119,28 +118,22 @@ def smooth_once():
     return changed
 
 
-def update_display():
-    """Update the canvas to match the matrix"""
-    for row in range(50):
-        for col in range(50):
-            color = 'white' if matrix[row][col] == 1 else 'black'
-            canvas.itemconfig(rectangles[(row, col)], fill=color)
-    canvas.update()
-
-
 def smooth(event):
     """Smooths until stable or max iterations reached"""
     max_iterations = 50
 
     for i in range(max_iterations):
         changed = smooth_once()
-        update_display()
-        time.sleep(0.1)
         if not changed:
-            print(f"Stabilized after {i + 1} iterations")
             break
-    else:
-        print(f"Stopped after {max_iterations} iterations")
+    
+
+    # Update display
+    for row in range(50):
+        for col in range(50):
+            color = 'white' if matrix[row][col] == 1 else 'black'
+            canvas.itemconfig(rectangles[(row, col)], fill=color)
+            
 
 
 canvas.bind("<Button-1>", on_click)
