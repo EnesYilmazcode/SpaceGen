@@ -4,7 +4,7 @@ import random
 matrix = [[1 for _ in range(50)] for _ in range(50)]
 
 root = tk.Tk()
-root.title("SpaceGen    r to random    c to clear    s to smooth    q to quit")
+root.title("SpaceGen    r to random    c to clear    q to quit")
 
 canvas = tk.Canvas(root, width=500, height=500, bg='white')
 canvas.pack()
@@ -57,12 +57,17 @@ def on_drag(event):
         paint_cell(row, col)
 
 def on_release(event):
-    """Stop dragging"""
-    global is_dragging
-    is_dragging = False
+    """Stop dragging and auto-smooth"""
+    global is_dragging, smooth_iteration
+    if is_dragging:
+        is_dragging = False
+        # Auto-start smoothing after drawing
+        smooth_iteration = 0
+        root.after(100, smooth_step)  # Small delay before smoothing starts
 
 def on_key_r(event):
     """Initialize random noise for cave generation (45% walls)"""
+    global smooth_iteration
     wall_chance = 0.45
 
     for row in range(50):
@@ -74,7 +79,9 @@ def on_key_r(event):
                 matrix[row][col] = 1
                 canvas.itemconfig(rectangles[(row, col)], fill='white')
 
-    
+    # Auto-start smoothing after random generation
+    smooth_iteration = 0
+    root.after(100, smooth_step)
 
 def on_key_c(event):
     """Clear all - reset everything to 1 (white)"""
