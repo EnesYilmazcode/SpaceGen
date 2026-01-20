@@ -4,7 +4,7 @@ import random
 matrix = [[1 for _ in range(50)] for _ in range(50)]
 
 root = tk.Tk()
-root.title("SpaceGen")
+root.title("SpaceGen    r to random    c to clear    s to smooth    q to quit")
 
 canvas = tk.Canvas(root, width=500, height=500, bg='white')
 canvas.pack()
@@ -23,13 +23,12 @@ for row in range(50):
         rect_id = canvas.create_rectangle(x1, y1, x2, y2, fill='white')
         rectangles[(row, col)] = rect_id
 
-# Track if mouse is being held down
 is_dragging = False
 
 def paint_cell(row, col):
     """Set a cell to 0 (black)"""
     if 0 <= row < 50 and 0 <= col < 50:
-        if matrix[row][col] == 1:  # Only paint if it's currently white
+        if matrix[row][col] == 1:
             matrix[row][col] = 0
             rect_id = rectangles[(row, col)]
             canvas.itemconfig(rect_id, fill='black')
@@ -115,7 +114,6 @@ def smooth_once():
 
     matrix = new_matrix
     
-    # Update display after each iteration
     for row in range(50):
         for col in range(50):
             color = 'white' if matrix[row][col] == 1 else 'black'
@@ -124,10 +122,9 @@ def smooth_once():
     return changed
 
 
-# Animation state
 smooth_iteration = 0
 smooth_max_iterations = 50
-smooth_delay_ms = 50  # ADJUST THIS VALUE: delay in milliseconds between smoothing steps
+smooth_delay_ms = 50
 
 def smooth_step():
     """Run one step of smoothing animation"""
@@ -138,18 +135,14 @@ def smooth_step():
         smooth_iteration += 1
         
         if changed:
-            # Schedule next iteration
             root.after(smooth_delay_ms, smooth_step)
         else:
-            # Stop if stable
             smooth_iteration = 0
     else:
-        # Max iterations reached
         smooth_iteration = 0
 
 
 def smooth(event):
-    """Start animated smoothing"""
     global smooth_iteration
     smooth_iteration = 0
     smooth_step()
@@ -161,5 +154,6 @@ canvas.bind("<ButtonRelease-1>", on_release)
 root.bind("r", on_key_r)
 root.bind("c", on_key_c)
 root.bind("s", smooth)
+root.bind("q", quit)
 
 root.mainloop()
